@@ -12,8 +12,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MyHomePage(),
+    return MaterialApp(
+      home: SafeArea(
+        child: MyHomePage(),
+      ),
     );
   }
 }
@@ -30,26 +32,37 @@ class _MyHomePageState extends State<MyHomePage> {
   GameState gameState = GameState.readyToStart;
   Timer? waitingTimer;
   Timer? stoppableTimer;
+  Color buttonColor = Colors.black12;
+
   @override
   Widget build(BuildContext context) {
+    final Size screen_size = MediaQuery.of(context).size;
+    final double top_padding = screen_size.height * 0.1;
+    final double bottom_padding = top_padding;
+
+
     return Scaffold(
+      backgroundColor: Color(0xFF282E3D),
       body: Stack(children: [
-        const Align(
-          alignment: Alignment(0, -0.9),
-          child: Text(
-            "Test your \nreaction speed!",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.w800,
-              color: Colors.black,
+        Padding(
+          padding: EdgeInsets.only(top: top_padding),
+          child: const Align(
+            alignment: Alignment(0, -0.9),
+            child: Text(
+              "Test your \nreaction speed!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
         Align(
           alignment: Alignment.center,
           child: ColoredBox(
-            color: Colors.black26,
+            color: Color(0xFF6D6D6D),
             child: SizedBox(
               height: 160,
               width: 300,
@@ -57,45 +70,55 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   millisecondsText,
                   style: const TextStyle(
-                    fontSize: 70,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
+                    fontSize: 38,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
           ),
         ),
-        Align(
-          alignment: const Alignment(0, 0.9),
-          child: GestureDetector(
-            onTap: () => setState(() {
-              switch (gameState) {
-                case (GameState.readyToStart):
-                  gameState = GameState.waiting;
-                  millisecondsText = '';
-                  _startWaitingTimer();
-                  break;
-                case (GameState.waiting):
-                  break;
-                case (GameState.canBeStopped):
-                  gameState = GameState.readyToStart;
-                  stoppableTimer?.cancel();
-                  break;
-              }
-            }),
-            child: ColoredBox(
-              color: Colors.black12,
-              child: SizedBox(
-                width: 200,
-                height: 200,
-                child: Center(
-                  child: Text(
-                    _getButtonText(),
-                    style: const TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black,
+        Padding(
+          padding: EdgeInsets.only(bottom: bottom_padding),
+          child: Align(
+            alignment: const Alignment(0, 0.9),
+            child: GestureDetector(
+              onTap: () => setState(() {
+// Когда написано START — цвет кнопки должен быть FF40CA88
+// Когда написано WAIT — цвет кнопки должен быть FFE0982D
+// Когда написано STOP — цвет кнопки должен быть FFE02D47
+
+                switch (gameState) {
+                  case (GameState.readyToStart):
+                    gameState = GameState.waiting;
+                    buttonColor = const Color(0xFFE0982D);
+                    millisecondsText = '';
+                    _startWaitingTimer();
+                    break;
+                  case (GameState.waiting):
+                    buttonColor = const Color(0xFFE02D47);
+                    break;
+                  case (GameState.canBeStopped):
+                    gameState = GameState.readyToStart;
+                    buttonColor = const Color(0xFF40CA88);
+                    stoppableTimer?.cancel();
+                    break;
+                }
+              }),
+              child: ColoredBox(
+                color: buttonColor,
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Center(
+                    child: Text(
+                      _getButtonText(),
+                      style: const TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
